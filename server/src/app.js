@@ -1,25 +1,30 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const path = require('path');
 const ticketRoutes = require('./routes/ticket.routes');
 const notFound = require('./middleware/notFound');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// Security HTTP headers
-app.use(helmet());
+// Security HTTP headers (disable strict CSP to allow fonts and icons)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false
+  })
+);
 
 // CORS configuration
 const allowedOrigin = process.env.CLIENT_URL || '*';
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
       if (!origin || allowedOrigin === '*' || origin === allowedOrigin) {
         callback(null, true);
       } else {
-        callback(null, true); // Allow all in dev, can restrict in production
+        callback(null, true);
       }
     },
     credentials: true,
@@ -44,7 +49,19 @@ app.get('/health', (req, res) => {
 // Mount Ticket API routes
 app.use('/api/tickets', ticketRoutes);
 
-// Fallback 404 handler
+// Serve static frontend assets from client/dist
+const clientDistPath = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDistPath));
+
+// Fallback all non-API GET routes to React SPA index.html
+app.get('*', (req, res, next) => {
+  if (req.originalUrl.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
+
+// Fallback 404 handler for unmatched API requests
 app.use(notFound);
 
 // Centralized error handler
