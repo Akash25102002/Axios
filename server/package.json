@@ -1,0 +1,25 @@
+{
+  "name": "supportflow-server",
+  "version": "1.0.0",
+  "description": "Production-ready Customer Support Ticketing CRM REST API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node --test"
+  },
+  "keywords": ["crm", "support", "tickets", "express", "mongodb"],
+  "author": "Akash",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "mongoose": "^8.5.2"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^9.4.0",
+    "nodemon": "^3.1.4"
+  }
+}
